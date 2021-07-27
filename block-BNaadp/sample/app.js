@@ -12,24 +12,28 @@ mongoose.connect("mongodb://localhost/sample" , {useNewUrlParser:true , useUnifi
 
 var app = express()
 
+//setup view engine
+app.set("view engine" , "ejs" )
+app.set("views" , path.join(__dirname , "views"))
+
 //middlewares
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 
-//setup view engine
-app.set("view engine" , "ejs" )
-app.set("views" , path.join(__dirname , "views"))
+
+
+app.use((req, res, next)=>{
+    res.cookie("Name" , "Vivek" )
+    next()
+  })
+  
 
 //routing
 app.use("/users" , usersrouter)
 
-app.use(cookieParser());
 
-app.use((req, res, next)=>{
-  console.log(req.cookies)
-  next()
-})
+
 
 
 //Error handler
