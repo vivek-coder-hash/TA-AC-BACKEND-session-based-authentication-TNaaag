@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require("mongoose")
 var session = require("express-session")
-//var MongoStore = require("connect-mongo")(session)
+var MongoStore = require("connect-mongo")
 
 require("dotenv").config()
 
@@ -29,8 +29,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//session add or session middleware
+app.use(session({
+  secret: process.env.SECRET , 
+  resave:false ,
+  saveUninitialized:false ,
+ // store: new MongoStore({mongooseConnection: mongoose.connection}) // otherwise default store is Memory store
+ store: MongoStore.create({ mongoUrl: 'mongodb://localhost/sample' })
+ 
+}))
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
