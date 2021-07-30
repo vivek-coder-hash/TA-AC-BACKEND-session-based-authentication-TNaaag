@@ -8,14 +8,26 @@ router.get('/', function(req, res, next) {
 });
 
 router.get("/register" , (req,res,next)=> {
-  res.render("register.ejs")
+ // console.log(req.flash("error")) // whether we are able to capture error or not
+  res.render("register.ejs" , {error : req.flash("error")[0]})
 })
 
 router.post("/register" , (req,res,next)=> {
   console.log(req.body) // data entered by user
   User.create(req.body , (err,user)=> {
     console.log(err ,user) // ID and hashed password
-    if(err) return next(err)
+    if(err) {
+      if(err.name === "MongoError") {
+        req.flash("error" , "Email/userId already exist")
+       return  res.redirect("/users/register")
+      }
+
+      if(err.name === "ValidationError") {
+        req.flash("error" , "Minimum length of password is 5")
+      return  res.redirect("/users/register")
+      }
+      return res.json({err})
+    }
     res.redirect("/users/login")
 
   })
@@ -40,6 +52,7 @@ router.post("/login" , (req,res,next)=> {
     if(err) return next(err)
 
     if(!user) {
+      req.flash("error" , "This User does not Registered")
       return res.redirect("/users/login")
     }
 
@@ -48,6 +61,7 @@ router.post("/login" , (req,res,next)=> {
       if(err) return next(err)
 
       if(!result) {
+        req.flash("error" , "password incorrect")
         return res.redirect("/users/login")
       }
 
