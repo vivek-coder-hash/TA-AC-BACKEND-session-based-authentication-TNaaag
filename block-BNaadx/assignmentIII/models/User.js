@@ -5,7 +5,9 @@ var Schema = mongoose.Schema
 var userSchema = new Schema({
     name:{type:String , required:true} , 
     email: {type:String , required:true , unique:true} ,
-    password:{type:String , minlength:5}
+    password:{type:String , minlength:5} ,
+    isAdmin: {type: Boolean , default:false , required: false},
+    itemId: [{ type: Schema.Types.ObjectId, ref: 'Item' }]
 }, {timestamps:true})
 
 
